@@ -4,29 +4,6 @@ provider "aws" {
 
 resource "aws_kms_key" "sns_sqs" {
   description = "Chave KMS para SNS e SQS"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Id      = "key-default-1"
-    Statement = [
-      {
-        Sid       = "Allow administration of the key"
-        Effect    = "Allow"
-        Principal = { AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root" }
-        Action    = "kms:*"
-        Resource  = "*"
-      },
-      {
-        Sid      = "Allow SNS to use the key"
-        Effect   = "Allow"
-        Principal = { Service = "sns.amazonaws.com" }
-        Action   = [
-          "kms:GenerateDataKey*",
-          "kms:Decrypt"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
 }
 
 resource "aws_sns_topic" "sns_transacoes_financeiras" {
@@ -90,42 +67,6 @@ resource "aws_sqs_queue_policy" "sqs_transacao_cartao_policy" {
   })
 }
 
-# role para sns
-
-resource "aws_iam_role" "sns_publish_role" {
-  name = "sns-publish-to-sqs"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "sns.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "sns_publish_policy" {
-  name = "sns-publish-to-sqs-policy"
-  role = aws_iam_role.sns_publish_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "sqs:SendMessage"
-        Resource = [
-          aws_sqs_queue.sqs_transacao_pix.arn,
-          aws_sqs_queue.sqs_transacao_cartao.arn
-        ]
-      }
-    ]
-  })
-}
 
 # subscricao dos topicos
 
