@@ -26,7 +26,7 @@ resource "aws_sqs_queue" "sqs_transacao_cartao" {
 # politica de acesso do sqs
 
 resource "aws_sqs_queue_policy" "sqs_transacao_pix_policy" {
-  queue_url = aws_sqs_queue.sqs_transacao_pix.id
+  queue_url = aws_sqs_queue.sqs_transacao_pix.url
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -47,7 +47,7 @@ resource "aws_sqs_queue_policy" "sqs_transacao_pix_policy" {
 }
 
 resource "aws_sqs_queue_policy" "sqs_transacao_cartao_policy" {
-  queue_url = aws_sqs_queue.sqs_transacao_cartao.id
+  queue_url = aws_sqs_queue.sqs_transacao_cartao.url
 
   policy = jsonencode({
     Version = "2012-10-17"
