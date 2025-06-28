@@ -4,6 +4,29 @@ provider "aws" {
 
 resource "aws_kms_key" "sns_sqs" {
   description = "Chave KMS para SNS e SQS"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "key-default-1"
+    Statement = [
+      {
+        Sid       = "Allow administration of the key"
+        Effect    = "Allow"
+        Principal = { AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root" }
+        Action    = "kms:*"
+        Resource  = "*"
+      },
+      {
+        Sid      = "Allow SNS to use the key"
+        Effect   = "Allow"
+        Principal = { Service = "sns.amazonaws.com" }
+        Action   = [
+          "kms:GenerateDataKey*",
+          "kms:Decrypt"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 resource "aws_sns_topic" "sns_transacoes_financeiras" {
@@ -111,7 +134,7 @@ resource "aws_sns_topic_subscription" "cartao" {
   protocol      = "sqs"
   endpoint      = aws_sqs_queue.sqs_transacao_cartao.arn
   filter_policy = jsonencode({
-    origem = "cartao"
+    origem = ["cartao"]
   })
 }
 
@@ -120,6 +143,6 @@ resource "aws_sns_topic_subscription" "pix" {
   protocol      = "sqs"
   endpoint      = aws_sqs_queue.sqs_transacao_pix.arn
   filter_policy = jsonencode({
-    origem = "pix"
+    origem = ["pix"]
   })
 }
