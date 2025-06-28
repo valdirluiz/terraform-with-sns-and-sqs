@@ -111,7 +111,7 @@ resource "aws_sns_topic_subscription" "cartao" {
   protocol      = "sqs"
   endpoint      = aws_sqs_queue.sqs_transacao_cartao.arn
   filter_policy = jsonencode({
-    origem = ["cartao"]
+    origem = "cartao"
   })
 }
 
@@ -120,6 +120,6 @@ resource "aws_sns_topic_subscription" "pix" {
   protocol      = "sqs"
   endpoint      = aws_sqs_queue.sqs_transacao_pix.arn
   filter_policy = jsonencode({
-    origem = ["pix"]
+    origem = "pix"
   })
 }
